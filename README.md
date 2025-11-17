@@ -4,7 +4,7 @@ Este repositorio contiene un conjunto de scripts de Octave/MATLAB diseñados par
 
 El proyecto se divide en dos partes principales:
 1.  **Validación del Modelo:** Se recrea y compara una curva de polarización (Voltaje vs. Corriente), curva Hidrógeno producido vs potencia eléctrica (H2 vs kW) y una curva de trabajo específico con datos del siguiente paper de referencia. Link: https://www-sciencedirect-com.pucdechile.idm.oclc.org/science/article/pii/S1876610217363506
-2.  **Simulación Dinámica:** Se utiliza el modelo validado para simular el comportamiento térmico del electrolizador (aumento de temperatura) cuando es alimentado por una fuente de potencia variable, como un panel solar en un día nublado.
+2.  **Simulación Dinámica:** Se utiliza el modelo validado para simular el comportamiento térmico del electrolizador (aumento de temperatura) cuando es alimentado por una fuente de potencia variable, como un panel solar en un día nublado. link paper de referencia: https://research-ebsco-com.pucdechile.idm.oclc.org/c/r6zury/viewer/pdf/atk445bn25?route=details
 
 ---
 
@@ -33,7 +33,7 @@ El objetivo es recrear la curva de polarización (Voltaje vs. Densidad de Corrie
 
 ## Parte 2: Simulación Dinámica con Perfil Solar (main_SIMULACION.m)
 
-Este script utiliza el modelo electroquímico validado para simular el comportamiento dinámico de la PEM, enfocándose en la respuesta térmica a una fuente de energía intermitente de un panel solar en un día nublado. link paper de referencia: https://research-ebsco-com.pucdechile.idm.oclc.org/c/r6zury/viewer/pdf/atk445bn25?route=details
+Este script utiliza el modelo electroquímico validado para simular el comportamiento dinámico de la PEM, enfocándose en la respuesta térmica a una fuente de energía intermitente de un panel solar en un día nublado. 
 
 ### Objetivo
 Simular la evolución de la **temperatura** y la **corriente** del stack PEM durante 24 horas, asumiendo que es alimentado por un panel solar en un día con alta variabilidad (nublado).
