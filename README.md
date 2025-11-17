@@ -43,7 +43,7 @@ Simular la evolución de la **temperatura** y la **corriente** del stack PEM dur
 2.  **Perfil de Potencia Solar:** Define una función anónima `P_target_func(t)` que entrega la potencia eléctrica (en Watts) disponible del panel solar en cualquier segundo `t` del día. Esta función simula un día nublado con variaciones rápidas. 
 3.  **Sistema de Ecuaciones (DAE):** El núcleo de la simulación es un sistema de Ecuaciones Diferenciales-Algebraicas (DAE) resuelto con `ode15s`. Este sistema está definido en `sistema_dae.m`:
     * **Ecuación Diferencial (Balance de Energía):** Es la Ecuación 1 (`res1`). Modela cómo cambia la temperatura de la PEM (`dT/dt`).
-        $C_{tot} \cdot \frac{dT}{dt} = Q_{gen\_neto} - Q_{loss}$
+        $C_{tot} \cdot \frac{dT}{dt} = P_{el}(t) - \dot{N}_{H_2}(I_celda) \cdot \Delta H_{T} - UA(T - T_{amb}$
         Donde `Q_gen_neto` es el calor generado (Potencia eléctrica menos el $\Delta H$ de la reacción) y `Q_loss` es el calor perdido al ambiente.
     * **Ecuación Algebraica (Balance de Potencia):** Es la Ecuación 2 (`res2`). Asegura que la potencia eléctrica consumida por la PEM es igual a la potencia suministrada por el panel solar en ese instante.
         $P_{panel}(t) = P_{stack}(i, T)$
