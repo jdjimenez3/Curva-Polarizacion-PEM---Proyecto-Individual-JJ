@@ -39,7 +39,7 @@ Este script utiliza el modelo electroquímico validado para simular el comportam
 Simular la evolución de la **temperatura** y la **corriente** del stack PEM durante 24 horas, asumiendo que es alimentado por un panel solar en un día con alta variabilidad (nublado).
 
 ### Funcionamiento
-1.  **Define Parámetros del Sistema:** Establece parámetros globales para la simulación dinámica, como la capacidad térmica total del stack (`C_tot`), el coeficiente de transferencia de calor con el ambiente (`UA`), y la temperatura ambiente (`T_amb_K`). El sistema trabaja a presión constante.
+1.  **Define Parámetros del Sistema:** Establece parámetros globales para la simulación dinámica, como la capacidad térmica total de la PEM (`C_tot`), el coeficiente de transferencia de calor con el ambiente (`UA`), y la temperatura ambiente (`T_amb_K`). El sistema trabaja a presión constante.
 2.  **Perfil de Potencia Solar:** Define una función anónima `P_target_func(t)` que entrega la potencia eléctrica (en Watts) disponible del panel solar en cualquier segundo `t` del día. Esta función simula un día nublado con variaciones rápidas. 
 3.  **Sistema de Ecuaciones (DAE):** El núcleo de la simulación es un sistema de Ecuaciones Diferenciales-Algebraicas (DAE) resuelto con `ode15s`. Este sistema está definido en `sistema_dae.m`:
     * **Ecuación Diferencial (Balance de Energía):** Es la Ecuación 1 (`res1`). Modela cómo cambia la temperatura de la PEM (`dT/dt`).
