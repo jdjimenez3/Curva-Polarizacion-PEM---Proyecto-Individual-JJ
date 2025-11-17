@@ -41,18 +41,47 @@ Simular la evolución de la **temperatura** y la **corriente** del stack PEM dur
 ### Funcionamiento
 1.  **Define Parámetros del Sistema:** Establece parámetros globales para la simulación dinámica, como la capacidad térmica total de la PEM (`C_tot`), el coeficiente de transferencia de calor con el ambiente (`UA`), y la temperatura ambiente (`T_amb_K`). El sistema trabaja a presión constante.
 2.  **Perfil de Potencia Solar:** Define una función anónima `P_target_func(t)` que entrega la potencia eléctrica (en Watts) disponible del panel solar en cualquier segundo `t` del día. Esta función simula un día nublado con variaciones rápidas. 
-Sistema de Ecuaciones (DAE): El núcleo de la simulación es un sistema de Ecuaciones Diferenciales-Algebraicas (DAE) resuelto con `ode15s`. Este sistema está definido en `sistema_dae.m`:
+# 📘 Sistema DAE del Modelo PEM
 
-* **Ecuación Diferencial (Balance de Energía):** Es la Ecuación 1 (`res1`). Modela cómo cambia la temperatura de la PEM (`dT/dt`).
-    $$
-    C_{tot} \frac{dT_{K}}{dt} = \left( P_{in} - (\dot{N}_{H_2} \cdot \Delta H_{T}) \right) - UA (T_{K} - T_{amb})
-    $$
-    Donde `Q_gen_neto` es el calor generado (Potencia eléctrica menos el $\Delta H$ de la reacción) y `Q_loss` es el calor perdido al ambiente.
+El núcleo de la simulación es un sistema de **Ecuaciones Diferenciales-Algebraicas (DAE)** resuelto con `ode15s`.  
+Este sistema está implementado en `sistema_dae.m`.
 
-* **Ecuación Algebraica (Balance de Potencia):** Es la Ecuación 2 (`res2`). Asegura que la potencia eléctrica consumida por la PEM es igual a la potencia suministrada por el panel solar en ese instante.
-    $$
-    P_{panel}(t) = P_{stack}(i, T)
-    $$
+---
+
+## 🔸 1. Ecuación Diferencial (Balance de Energía)
+
+Corresponde a la **Ecuación 1 (`res1`)**, que modela cómo evoluciona la temperatura de la celda PEM:
+
+$$
+C_{\text{tot}} \frac{dT_K}{dt}
+   = \left( P_{\text{in}} - \dot{N}_{H_2}\,\Delta H_T \right)
+     - UA\,(T_K - T_{\text{amb}})
+$$
+
+Donde:
+
+- \(P_{\text{in}}\): potencia eléctrica entregada al stack  
+- \(\dot{N}_{H_2}\): flujo molar de hidrógeno producido  
+- \(\Delta H_T\): entalpía de reacción dependiente de la temperatura  
+- \(UA\): coeficiente global de pérdidas térmicas  
+- \(T_K\): temperatura del stack (K)  
+- \(T_{\text{amb}}\): temperatura ambiente  
+
+---
+
+## 🔸 2. Ecuación Algebraica (Balance de Potencia)
+
+Corresponde a la **Ecuación 2 (`res2`)**, que asegura el equilibrio entre la potencia entregada por el panel solar y la consumida por la celda:
+
+$$
+P_{\text{panel}}(t) = P_{\text{stack}}(i, T)
+$$
+
+Donde:
+
+- \(P_{\text{panel}}(t)\): potencia generada por el panel solar  
+- \(P_{\text{stack}}(i, T)\): potencia eléctrica requerida por el stack  
+
 
 * **Solver:** El solver `ode15s` itera en cada paso de tiempo para encontrar la temperatura (`T_K_act`) y la corriente (`i_cell_act`) que satisfacen ambas ecuaciones simultáneamente.
 5.  **Cálculo de Voltaje Interno:** Para resolver la ecuación algebraica, el solver llama continuamente a `calcular_voltaje_ESCALAR.m`. Esta es una versión optimizada del modelo de la Parte 1, diseñada para calcular el voltaje para un solo valor (escalar) de corriente y temperatura.
