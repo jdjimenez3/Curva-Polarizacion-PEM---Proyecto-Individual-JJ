@@ -100,6 +100,12 @@ $$
 \text{res}_1 = \underbrace{(P(t) - \dot{N}_{H_2} \cdot \Delta H(T))}_{\text{Calor Generado Neto}} - \underbrace{UA \cdot (T_{K} - T_{amb})}_{\text{Calor Disipado}}
 $$
 
+Al multiplicar por la masa térmica en la matriz $M$ ($M_{1,1} = C_{tot}$), la ecuación diferencial resultante es: 
+
+$$
+C_{tot} \cdot \frac{dT}{dt} = \text{res}_1
+$$
+
 Donde:
 
 - $P_{\text{t}}$: potencia eléctrica entregada del panel solar a la PEM
@@ -144,7 +150,7 @@ Residuo Algebraico (`res2`): Balance de Potencia.
 Este residuo fuerza a que sea cero la resta entre la potencia entregada del panel solar y la potencia de la PEM. Calcula la discrepancia entre la energía disponible y la consumida:
 
 $$
-\text{res}_2 = P_{in}(t) - \underbrace{V_{cell}(I_{cell}, T) \cdot i_{cell} \cdot A \cdot N_{cells}}_{\text{Potencia Consumida de la PEM}}
+\text{res}_2 = P_{in}(t) - \underbrace{V_{cell}(I_{cell}, T) \cdot I_{cell} \cdot A \cdot N_{cells}}_{\text{Potencia Consumida de la PEM}}
 $$
 
 Dado que el término correspondiente en la matriz de masa es cero ($M_{2,2} = 0$), el solver ajusta la corriente instantáneamente para que:
@@ -153,7 +159,23 @@ $$
 0 = \text{res}_2
 $$
 
----
+En definitiva, el solver resuelve el sistema lineal en cada paso de tiempo siguiendo la estructura matricial $M \cdot \dot{y} = \text{res}$:
+
+$$
+\begin{bmatrix}
+C_{\text{tot}} & 0 \\
+0 & 0
+\end{bmatrix} 
+\cdot 
+\begin{bmatrix}
+\dfrac{dT}{dt} \\
+\dfrac{dI_{\text{cell}}}{dt}
+\end{bmatrix}
+=\begin{bmatrix}
+\text{res}_1 \\
+\text{res}_2
+\end{bmatrix}
+$$
 
 
 
