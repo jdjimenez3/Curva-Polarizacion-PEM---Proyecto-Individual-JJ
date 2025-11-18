@@ -54,13 +54,13 @@ Simular la evolución de la **temperatura** y la **corriente** de la PEM durante
    La potencia en el tiempo se calcula como:
 
    $$
-   P(t) = I_{\text{cloudy}}(t) \cdot \A \cdot \eta
+   P(t) = I_{\text{cloudy}}(t) \cdot A \cdot \eta
    $$
 
    donde:  
-   * \A = área del panel  
-   * \eta = eficiencia del panel  
-   * \S_{max} = irradiancia máxima del día  
+   * $$ A $$ = área del panel  
+   * $$ \eta $$ = eficiencia del panel  
+   * $$ S_{max} $$ = irradiancia máxima del día  
 
    Se define la potencia máxima como:
 
