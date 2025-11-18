@@ -10,13 +10,13 @@ El proyecto se divide en dos partes principales:
 
 ## Parte 1: Validación de Curva de Polarización (main_PROYECTO.m)
 
-Este script se enfoca en la validación del modelo electroquímico en estado estacionario.
+Este script se enfoca en la validación del modelo electroquímico en estado estacionario. Utilizar `main_PROYECTO.m`
 
 ### Objetivo
-El objetivo es recrear la curva de polarización (Voltaje vs. Densidad de Corriente) presentada en el paper (identificado en los gráficos como "Modelo Colbertaldo P.") y comparar los resultados del modelo propio bajo las mismas condiciones de operación (55°C y 70 bar). 
+El objetivo es recrear la curva de polarización (Voltaje vs. Densidad de Corriente) presentada en el paper (identificado en los gráficos como "Modelo Colbertaldo P.") y comparar los resultados del modelo recreado bajo las mismas condiciones de operación (55°C y 70 bar). 
 
 ### Funcionamiento
-1.  **Define Condiciones:** Establece los parámetros de operación fijos (temperatura `T_op_C` y presión `P_op_bar`). Temperatura y presión se puede cambiar. 
+1.  **Define Condiciones:** Establece los parámetros de operación (temperatura `T_op_C` y presión `P_op_bar`). La temperatura y presión se puede cambiar. 
 2.  **Cálculo del Modelo:** Llama a la función `calcularCurvaPolarizacion.m` con un vector de densidades de corriente (`i_input_vector`) el cual debe ser escrito como lista dentro del código. 
 3.  **Cálculo de Sobrepotenciales:** Dentro de `calcularCurvaPolarizacion.m`, el voltaje total de la celda se calcula como la suma de los potenciales y sobrepotenciales:
     * **$V_{id}$ (Potencial Ideal/Nernst):** Calculado usando `calculo_DeltaG.m` y las presiones parciales (obtenidas con la librería `XSteam.m`).
@@ -33,15 +33,15 @@ El objetivo es recrear la curva de polarización (Voltaje vs. Densidad de Corrie
 
 ## Parte 2: Simulación Dinámica con Perfil Solar (main_SIMULACION.m)
 
-Este script utiliza el modelo electroquímico validado para simular el comportamiento dinámico de la PEM, enfocándose en la respuesta térmica a una fuente de energía intermitente de un panel solar en un día nublado. 
+Este script utiliza el modelo electroquímico validado para simular el comportamiento dinámico de la PEM, enfocándose en la respuesta térmica a una fuente de energía intermitente de un panel solar en un día nublado. Utilizar `main_SIMULACION.m`
 
 ### Objetivo
-Simular la evolución de la **temperatura** y la **corriente** del stack PEM durante 24 horas, asumiendo que es alimentado por un panel solar en un día con alta variabilidad (nublado).
+Simular la evolución de la **temperatura** y la **corriente** de la PEM durante 24 horas, asumiendo que es alimentado por un panel solar en un día nublado.
 
 ### Funcionamiento
 1.  **Define Parámetros del Sistema:** Establece parámetros globales para la simulación dinámica, como la capacidad térmica total de la PEM (`C_tot`), el coeficiente de transferencia de calor con el ambiente (`UA`), y la temperatura ambiente (`T_amb_K`). El sistema trabaja a presión constante.
 2.  **Perfil de Potencia Solar:** Define una función anónima `P_target_func(t)` que entrega la potencia eléctrica (en Watts) disponible del panel solar en cualquier segundo `t` del día. Esta función simula un día nublado con variaciones rápidas. 
-# 📘 Sistema DAE del Modelo PEM
+# Sistema DAE del Modelo PEM
 
 El núcleo de la simulación es un sistema de **Ecuaciones Diferenciales-Algebraicas (DAE)** resuelto con `ode15s`.  
 Este sistema está implementado en `sistema_dae.m`.
