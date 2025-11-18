@@ -44,22 +44,7 @@ Simular la evolución de la **temperatura** y la **corriente** de la PEM durante
    Para poder transformar la ecuación de densidad de corriente variable en el tiempo en un día nublado
    La potencia objetivo del panel solar se define como:
 
-$$
-P_{\text{target}}(t_s) =
-\mathbf{1}_{\left(t_{\text{rise}} < \frac{t_s}{3600} < t_{\text{set}}\right)}
-\cdot
-\Bigg[
-P_{\max}
-\sin\!\left(
-\pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}
-\right)
-\Bigg]
-\cdot
-\Bigg[
-1
-- a_1 \left|\sin\!\left(b_1 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_1}
-- a_2 \left|\sin\!\left(b_2 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_2}
-\Bigg]
+$$ P_{\text{target}}(t_s) = \mathbf{1}_{\left(t_{\text{rise}} < \frac{t_s}{3600} < t_{\text{set}}\right)}\cdot\Bigg[P_{\max} \sin\!\left(\pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right) \Bigg] \cdot \Bigg[1- a_1 \left|\sin\!\left(b_1 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_1} - a_2 \left|\sin\!\left(b_2 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} -t_{\text{rise}}}\right)\right|^{c_2}\Bigg]
 $$
 
 # Sistema DAE del Modelo PEM
