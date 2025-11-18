@@ -97,7 +97,7 @@ $$
    Este residuo representa la acumulación de energía térmica. El código calcula la diferencia entre el calor generado y el disipado:
         
 $$
-\text{res}_1 = \underbrace{(P(t) - \dot{N}_{H_2} \cdot \Delta H(T))}_{\text{Calor Generado Neto}} - \underbrace{UA \cdot (T_{K} - T_{amb})}_{\text{Calor Disipado}}
+\text{res}_1 = \underbrace{(P(t) - \dot{N}_{H_2} \cdot \Delta H(T))}_{\text{Calor Generado Neto}} - \underbrace{UA \cdot (T - T_{amb})}_{\text{Calor Disipado}}
 $$
 
 Al multiplicar por la masa térmica en la matriz $M$ ($M_{1,1} = C_{tot}$), la ecuación diferencial resultante es: 
@@ -135,7 +135,7 @@ $$
 Los valores de $C_p$ se modelan utilizando polinomios de la base de datos **NIST**.
 
 - $UA$: coeficiente global de pérdidas térmicas 
-- $T_K$: temperatura de la PEM en Kelvin
+- $T$: temperatura de la PEM en Kelvin
 - $T_{\text{amb}}$: temperatura ambiente en Kelvin  
 
 
@@ -152,6 +152,8 @@ Este residuo fuerza a que sea cero la resta entre la potencia entregada del pane
 $$
 \text{res}_2 = P_{in}(t) - \underbrace{V_{cell}(I_{cell}, T) \cdot I_{cell} \cdot A \cdot N_{cells}}_{\text{Potencia Consumida de la PEM}}
 $$
+
+Para realizar el cálculo de voltaje, el solver llama continuamente a `calcular_voltaje_ESCALAR.m`. Esta es una versión optimizada del modelo de la Parte 1, diseñada para calcular el voltaje para un solo valor (escalar) de corriente y temperatura.
 
 Dado que el término correspondiente en la matriz de masa es cero ($M_{2,2} = 0$), el solver ajusta la corriente instantáneamente para que:
 
@@ -178,44 +180,10 @@ C_{\text{tot}} & 0 \\
 $$
 
 
+4.  **Solver:** El solver `ode15s` itera en cada paso de tiempo para encontrar la temperatura (`T_K_act`) y la corriente (`i_cell_act`) que satisfacen ambas ecuaciones simultáneamente.
 
 
-
-
-
-
-
-## Ecuación Diferencial (Balance de Energía)
-
-Corresponde a la **Ecuación 1 (`res1`)**, que modela cómo evoluciona la temperatura de la celda PEM:
-
-$$
-C_{\text{tot}} \frac{dT_K}{dt}
-   = \left( P_{\text{in}} - \dot{N}_{H_2}\,\Delta H_T \right)
-     - UA\,(T_K - T_{\text{amb}})
-$$
-
-
-
-
-
-## 🔸 2. Ecuación Algebraica (Balance de Potencia)
-
-Corresponde a la **Ecuación 2 (`res2`)**, que asegura el equilibrio entre la potencia entregada por el panel solar y la consumida por la celda:
-
-$$
-P_{\text{panel}}(t) = P_{\text{stack}}(i, T)
-$$
-
-Donde:
-
-- \(P_{\text{panel}}(t)\): potencia generada por el panel solar  
-- \(P_{\text{stack}}(i, T)\): potencia eléctrica requerida por el stack  
-
-
-* **Solver:** El solver `ode15s` itera en cada paso de tiempo para encontrar la temperatura (`T_K_act`) y la corriente (`i_cell_act`) que satisfacen ambas ecuaciones simultáneamente.
-5.  **Cálculo de Voltaje Interno:** Para resolver la ecuación algebraica, el solver llama continuamente a `calcular_voltaje_ESCALAR.m`. Esta es una versión optimizada del modelo de la Parte 1, diseñada para calcular el voltaje para un solo valor (escalar) de corriente y temperatura.
-6.  **Resultados:** El script genera un gráfico de 24 horas que muestra:
+5.  **Resultados:** El script genera un gráfico de 24 horas que muestra:
     * Arriba: El perfil de potencia de entrada del panel solar (kW).
     * Abajo: La evolución de la temperatura del electrolizador (°C) como respuesta a esa potencia.
 
