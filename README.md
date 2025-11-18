@@ -42,33 +42,32 @@ Simular la evolución de la **temperatura** y la **corriente** de la PEM durante
 1.  **Define Parámetros del Sistema:** Establece parámetros globales para la simulación dinámica, como la capacidad térmica total de la PEM (`C_tot`), el coeficiente de transferencia de calor con el ambiente (`UA`), y la temperatura ambiente (`T_amb_K`). El sistema trabaja a presión constante.
 2.  **Perfil de Potencia Solar:** Define una función anónima `P_target_func(t)` que entrega la potencia eléctrica (en Watts) disponible del panel solar en cualquier segundo `t` del día. Esta función simula un día nublado con variaciones rápidas.
 
+      Para estimar la potencia generada por un panel solar en un día nublado, se utiliza la ecuación de densidad de corriente.
 
-   Para estimar la potencia generada por un panel solar en un día nublado, se utiliza la ecuación de densidad de corriente.
+      La expresión de la irradiancia nublada que se menciona en el paper es la siguiente:
 
-   La expresión de la irradiancia nublada que se menciona en el paper es la siguiente:
+      $$
+      I_{\text{cloudy}}(t_s) = I_{\max}\sin\!\left(\pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\left[1- a_1 \left|\sin\!\left(b_1 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_1}-a_2\left|\sin\!\left(b_2 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_2}\right]
+      $$
 
-   $$
-   I_{\text{cloudy}}(t) = S_{\max}\sin\!\left(\pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\left[1 - a_1 \left|\sin\!\left(b_1 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} -t_{\text{rise}}}\right)\right|^{c_1} - a_2 \left|\sin\!\left(b_2 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_2}\right]
-   $$
+      La potencia en el tiempo se calcula como:
 
-   La potencia en el tiempo se calcula como:
+      $$
+      P(t) = I_{\text{cloudy}}(t) \cdot A \cdot \eta
+      $$
 
-   $$
-   P(t) = I_{\text{cloudy}}(t) \cdot A \cdot \eta
-   $$
+      donde:  
+      * $$
+        A
+        $$  = área del panel  
+      * $$
+        \eta
+        $$ = eficiencia del panel  
+      * $$
+        S_{\max}
+        $$ = irradiancia máxima del día  
 
-   donde:  
-   * $$
-     A
-     $$ = área del panel  
-   * $$
-     \eta
-     $$ = eficiencia del panel  
-   * $$
-     S_{\max}
-     $$ = irradiancia máxima del día  
-
-   Se define la potencia máxima como:
+      Se define la potencia máxima como:
 
    $$
    P_{\max} = A \eta S_{\max}
