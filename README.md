@@ -40,7 +40,28 @@ Simular la evolución de la **temperatura** y la **corriente** de la PEM durante
 
 ### Funcionamiento
 1.  **Define Parámetros del Sistema:** Establece parámetros globales para la simulación dinámica, como la capacidad térmica total de la PEM (`C_tot`), el coeficiente de transferencia de calor con el ambiente (`UA`), y la temperatura ambiente (`T_amb_K`). El sistema trabaja a presión constante.
-2.  **Perfil de Potencia Solar:** Define una función anónima `P_target_func(t)` que entrega la potencia eléctrica (en Watts) disponible del panel solar en cualquier segundo `t` del día. Esta función simula un día nublado con variaciones rápidas. 
+2.  **Perfil de Potencia Solar:** Define una función anónima `P_target_func(t)` que entrega la potencia eléctrica (en Watts) disponible del panel solar en cualquier segundo `t` del día. Esta función simula un día nublado con variaciones rápidas.
+   Para poder transformar la ecuación de densidad de corriente variable en el tiempo en un día nublado
+   La potencia objetivo del panel solar se define como:
+
+$$
+P_{\text{target}}(t_s) =
+\mathbf{1}_{\left(t_{\text{rise}} < \frac{t_s}{3600} < t_{\text{set}}\right)}
+\cdot
+\Bigg[
+P_{\max}
+\sin\!\left(
+\pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}
+\right)
+\Bigg]
+\cdot
+\Bigg[
+1
+- a_1 \left|\sin\!\left(b_1 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_1}
+- a_2 \left|\sin\!\left(b_2 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_2}
+\Bigg]
+$$
+
 # Sistema DAE del Modelo PEM
 
 El núcleo de la simulación es un sistema de **Ecuaciones Diferenciales-Algebraicas (DAE)** resuelto con `ode15s`.  
