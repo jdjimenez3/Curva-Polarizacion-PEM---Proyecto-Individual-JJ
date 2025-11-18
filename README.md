@@ -42,50 +42,77 @@ Simular la evolución de la **temperatura** y la **corriente** de la PEM durante
 1.  **Define Parámetros del Sistema:** Establece parámetros globales para la simulación dinámica, como la capacidad térmica total de la PEM (`C_tot`), el coeficiente de transferencia de calor con el ambiente (`UA`), y la temperatura ambiente (`T_amb_K`). El sistema trabaja a presión constante.
 2.  **Perfil de Potencia Solar:** Define una función anónima `P_target_func(t)` que entrega la potencia eléctrica (en Watts) disponible del panel solar en cualquier segundo `t` del día. Esta función simula un día nublado con variaciones rápidas.
 
-      Para estimar la potencia generada por un panel solar en un día nublado, se utiliza la ecuación de densidad de corriente.
-
-      La expresión de la irradiancia nublada que se menciona en el paper es la siguiente:
-
-      $$
-      I_{\text{cloudy}}(t_s) = I_{\max}\sin\!\left(\pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\left[1- a_1 \left|\sin\!\left(b_1 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_1}-a_2\left|\sin\!\left(b_2 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_2}\right]
-      $$
-
-      La potencia en el tiempo se calcula como:
-
-      $$
-      P(t) = I_{\text{cloudy}}(t) \cdot A \cdot \eta
-      $$
-
-      donde:  
-      * $$
-        A
-        $$  = área del panel  
-      * $$
-        \eta
-        $$ = eficiencia del panel  
-      * $$
-        S_{\max}
-        $$ = irradiancia máxima del día  
-
-      Se define la potencia máxima como:
+Para estimar la potencia generada por un panel solar en un día nublado, se utiliza la ecuación de densidad de corriente que se menciona en el paper:
 
    $$
-   P_{\max} = A \eta S_{\max}
+   I_{cloudy}(t) = S_{max} sin\left(\frac{\pi(\frac{t}{3600} - t_{\text{rise}})}{t_{\text{set}} - t_{\text{rise}}}\right)\left[1- a_1 \left|\sin\left(b_1\pi\frac{\frac{t}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_1}-a_2\left|\sin\left(b_2\pi\frac{\frac{t}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_2}\right]
+   $$
+   
+La potencia en el tiempo se calcula como:
+   
+   $$
+   P(t) = I_{\text{cloudy}}(t) \cdot A \cdot \eta
+   $$
+   
+Donde:  
+* A = El area de los paneles solares
+* $\eta$ = Eficiencia de los paneles solares
+* $S_{\max}$ = irradiancia máxima del día  
+
+Se define la potencia máxima como:
+
+   $$
+   P_{max} = A \cdot \eta \cdot S_{max}
    $$
 
    Reemplazando:
 
-   $$ P_{\text{target}}(t_s) = \mathbf{1}_{\left(t_{\text{rise}} < \frac{t_s}{3600} < t_{\text{set}}\right)}\cdot\Bigg[P_{\max} \sin\!\left(\pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right) \Bigg]       \cdot \Bigg[1- a_1 \left|\sin\!\left(b_1 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_1} - a_2 \left|\sin\!\left(b_2 \pi\,\frac{\frac{t_s}{3600} - t_{\text{rise}}}{t_{\text{set}} -  t_{\text{rise}}}\right)\right|^{c_2}\Bigg]
    $$
+   P(t) = P_{max} sin\left(\frac{\pi(\frac{t}{3600} - t_{\text{rise}})}{t_{\text{set}} - t_{\text{rise}}}\right)\left[1- a_1 \left|\sin\left(b_1\pi\frac{\frac{t}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_1}-a_2\left|\sin\left(b_2\pi\frac{\frac{t}{3600} - t_{\text{rise}}}{t_{\text{set}} - t_{\text{rise}}}\right)\right|^{c_2}\right]
+   $$
+   
+3.  **Modelo Matemático (Sistema DAE):** En el código (`sistema_dae.m`), no definimos las derivadas explícitamente, sino que calculamos las residuales del sistema.
+
+   $$
+   M \cdot \dot{y} = f(t,y)
+   $$
+
+   
+Donde:
+* $y = [T_{K}, i_{cell}]$ es el vector de estado (Temperatura y Corriente).
+* $M$ es la **Matriz**, que define qué ecuaciones son diferenciales y cuáles son algebraicas.
+* $\text{res}$ es el vector de residuos calculado en cada paso de tiempo.
+
+
+    * **Definición de los Residuos:** El script `sistema_dae.m` calcula dos residuos que representan los balances de energía y de igualdad:
+      * **Residuo Diferencial (`res1`):** Balance de Energía.
+       
+$$
+C_{\text{tot}} \frac{dT}{dt} = \underbrace{P_{\text{in}}(t) - \left(\dot{N}_{H_2} \cdot \Delta H(T)\right)}_{\text{Calor generado neto}} - \underbrace{UA \left(T - T_{\text{amb}}\right)}_{\text{Pérdidas térmicas}}
+$$
   
-# Sistema DAE del Modelo PEM
+      
+  Este residuo representa la acumulación de energía térmica. El código calcula la diferencia entre el calor generado y el disipado:
+        
+$$
+\text{res}_1 = \underbrace{(P_{in} - \dot{N}_{H_2} \cdot \Delta H_T)}_{\text{Calor Generado Neto}} - \underbrace{UA \cdot (T_{K} - T_{amb})}_{\text{Calor Disipado}}
+$$
 
-El núcleo de la simulación es un sistema de **Ecuaciones Diferenciales-Algebraicas (DAE)** resuelto con `ode15s`.  
-Este sistema está implementado en `sistema_dae.m`.
 
----
 
-## 🔸 1. Ecuación Diferencial (Balance de Energía)
+
+
+
+
+
+
+
+
+
+
+
+
+## Ecuación Diferencial (Balance de Energía)
 
 Corresponde a la **Ecuación 1 (`res1`)**, que modela cómo evoluciona la temperatura de la celda PEM:
 
@@ -104,7 +131,7 @@ Donde:
 - \(T_K\): temperatura del stack (K)  
 - \(T_{\text{amb}}\): temperatura ambiente  
 
----
+
 
 ## 🔸 2. Ecuación Algebraica (Balance de Potencia)
 
