@@ -85,24 +85,75 @@ Donde:
 
 
     * **Definición de los Residuos:** El script `sistema_dae.m` calcula dos residuos que representan los balances de energía y de igualdad:
-      * **Residuo Diferencial (`res1`):** Balance de Energía.
+
+Residuo Diferencial (`res1`): Balance de Energía.
+
        
 $$
-C_{\text{tot}} \frac{dT}{dt} = \underbrace{P_{\text{in}}(t) - \left(\dot{N}_{H_2} \cdot \Delta H(T)\right)}_{\text{Calor generado neto}} - \underbrace{UA \left(T - T_{\text{amb}}\right)}_{\text{Pérdidas térmicas}}
+C_{\text{tot}} \frac{dT}{dt} = \underbrace{P(t) - \left(\dot{N}_{H_2} \cdot \Delta H(T)\right)}_{\text{Calor generado neto}} - \underbrace{UA \left(T - T_{\text{amb}}\right)}_{\text{Pérdidas térmicas}}
 $$
-  
-      
-  Este residuo representa la acumulación de energía térmica. El código calcula la diferencia entre el calor generado y el disipado:
+          
+
+   Este residuo representa la acumulación de energía térmica. El código calcula la diferencia entre el calor generado y el disipado:
         
 $$
-\text{res}_1 = \underbrace{(P_{in} - \dot{N}_{H_2} \cdot \Delta H_T)}_{\text{Calor Generado Neto}} - \underbrace{UA \cdot (T_{K} - T_{amb})}_{\text{Calor Disipado}}
+\text{res}_1 = \underbrace{(P(t) - \dot{N}_{H_2} \cdot \Delta H(T))}_{\text{Calor Generado Neto}} - \underbrace{UA \cdot (T_{K} - T_{amb})}_{\text{Calor Disipado}}
+$$
+
+Donde:
+
+- $P_{\text{t}}$: potencia eléctrica entregada del panel solar a la PEM
+- $\dot{N}_{H_2}$: flujo molar de hidrógeno producido, el cual es calculado con la ecuación de Faraday.
+  
+$$
+\dot{N}_{H_2} = \frac{I_{cell}(t) \cdot N_{cell} \cdot A}{\eta F}
 $$
 
 
+- $\Delta H(T)$: La entalpía de reacción no es constante, sino que varía con la temperatura. En el script `calculo_DeltaG_MODIFICADO.m`, esta se calcula ajustando el valor estándar a 298.15 K mediante la integral de las capacidades caloríficas ($C_p$):
+
+$$
+\Delta H(T) = \Delta H^{\circ}_{298K} + \int_{298.15}^{T} \Delta C_p(T) dT
+$$
+
+Donde el término $\Delta C_p(T)$ representa la diferencia de capacidades caloríficas entre productos y reactivos para la reacción de electrólisis:
+
+$$
+H_2O \to H_2 + 0.5 O_2
+$$
+
+$$
+\Delta C_p(T) = \left( C_{p,H_2}(T) + 0.5 \cdot C_{p,O_2}(T) \right) - C_{p,H_2O(l)}(T)
+$$
+
+Los valores de $C_p$ se modelan utilizando polinomios de la base de datos **NIST**.
+
+- $UA$: coeficiente global de pérdidas térmicas 
+- $T_K$: temperatura de la PEM en Kelvin
+- $T_{\text{amb}}$: temperatura ambiente en Kelvin  
 
 
 
 
+
+
+
+
+Residuo Algebraico (`res2`): Balance de Potencia.
+
+Este residuo fuerza a que sea cero la resta entre la potencia entregada del panel solar y la potencia de la PEM. Calcula la discrepancia entre la energía disponible y la consumida:
+
+$$
+\text{res}_2 = P_{in}(t) - \underbrace{V_{cell}(I_{cell}, T) \cdot i_{cell} \cdot A \cdot N_{cells}}_{\text{Potencia Consumida de la PEM}}
+$$
+
+Dado que el término correspondiente en la matriz de masa es cero ($M_{2,2} = 0$), el solver ajusta la corriente instantáneamente para que:
+
+$$
+0 = \text{res}_2
+$$
+
+---
 
 
 
@@ -122,14 +173,7 @@ C_{\text{tot}} \frac{dT_K}{dt}
      - UA\,(T_K - T_{\text{amb}})
 $$
 
-Donde:
 
-- \(P_{\text{in}}\): potencia eléctrica entregada al stack  
-- \(\dot{N}_{H_2}\): flujo molar de hidrógeno producido  
-- \(\Delta H_T\): entalpía de reacción dependiente de la temperatura  
-- \(UA\): coeficiente global de pérdidas térmicas  
-- \(T_K\): temperatura del stack (K)  
-- \(T_{\text{amb}}\): temperatura ambiente  
 
 
 
