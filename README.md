@@ -58,9 +58,15 @@ Simular la evolución de la **temperatura** y la **corriente** de la PEM durante
    $$
 
    donde:  
-   * $$ A $$ = área del panel  
-   * $$ \eta $$ = eficiencia del panel  
-   * $$ S_{max} $$ = irradiancia máxima del día  
+   * $$
+     A
+     $$ = área del panel  
+   * $$
+     \eta
+     $$ = eficiencia del panel  
+   * $$
+     S_{\max}
+     $$ = irradiancia máxima del día  
 
    Se define la potencia máxima como:
 
