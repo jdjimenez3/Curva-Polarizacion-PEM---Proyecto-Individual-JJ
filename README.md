@@ -54,8 +54,11 @@ El objetivo es recrear la curva de polarización (Voltaje vs. Densidad de Corrie
 5.  **Comparación:** El script calcula el error entre el vector de voltajes calculado (`V_cell`) con el vector de voltajes del paper (`Vcell_paper`), este útlimo debe ser escrito como lista dentro del código. 
 6.  **Generación de Gráficos:** Se generan tres figuras que comparan el "Modelo recreado" vs. el "Modelo Colbertaldo P.":
     * Curva de Polarización (V vs. A/cm²).
+      ![Curva de Polarización (V vs. A/cm²)](curva_pola_OP.jpg)
     * Producción de H₂ (Nm³/h) vs. Potencia Eléctrica (kW).
+      ![Producción de H₂ (Nm³/h) vs. Potencia Eléctrica (kW)](PROD_HIDRO_OPjpg.jpg)
     * Trabajo Específico (kWh/kg H₂) vs. Producción de H₂ (g/h).
+      ![Trabajo Específico (kWh/kg H₂) vs. Producción de H₂ (g/h).)](WP_OP.jpg)
 
 ---
 
@@ -239,10 +242,10 @@ $$
 2.  Coloque todos los archivos `.m` en el mismo directorio.
 3.  IMPORTANTE: Asegúrese de que la biblioteca `XSteam.m` esté en el path de Octave/MATLAB.
 4.  Para la validación del modelo estacionario:
-    ```octave
-    >> main_PROYECTO
-    ```
+
+    `main_PROYECTO`
+
 5.  Para la simulación dinámica del sistema:
-    ```octave
-    >> main_SIMULACION
-    ```
+
+    `main_SIMULACION`
+
