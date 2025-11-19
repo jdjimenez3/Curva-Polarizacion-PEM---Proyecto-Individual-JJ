@@ -19,12 +19,40 @@ El objetivo es recrear la curva de polarización (Voltaje vs. Densidad de Corrie
 1.  **Define Condiciones:** Establece los parámetros de operación (temperatura `T_op_C` y presión `P_op_bar`). La temperatura y presión se puede cambiar. 
 2.  **Cálculo del Modelo:** Llama a la función `calcularCurvaPolarizacion.m` con un vector de densidades de corriente (`i_input_vector`) el cual debe ser escrito como lista dentro del código. 
 3.  **Cálculo de Sobrepotenciales:** Dentro de `calcularCurvaPolarizacion.m`, el voltaje total de la celda se calcula como la suma de los potenciales y sobrepotenciales:
-    * **$V_{id}$ (Potencial Ideal/Nernst):** Calculado usando `calculo_DeltaG.m` y las presiones parciales (obtenidas con la librería `XSteam.m`).
-    * **$V_{act}$ (Sobrepotencial de Activación):** Modelado con la simplificación de Tafel.
-    * **$V_{ohm}$ (Sobrepotencial Óhmico):** Considera la resistividad de electrodos y la conductividad de la membrana (calculada con la correlación de Springer). Se toma el supuesto de una resistencia de contacto de 0.175 ohms.
+ 
+    
+      $V_{cell} = V_{id} + V_{act} + V_{ohm} + V_{diff}$
+   
+    * **$V_{id}$ (Potencial Ideal/Nernst):** Se calcula utilizando la variación de energía libre de Gibbs $\Delta G(T)$ dentro del archivo `calculo_DeltaG.m` y las presiones parciales (obtenidas con la librería `XSteam.m`).
+      
+      $V_{id} = \frac{\Delta G(T)}{nF} + \frac{RT}{nF} \ln \left( \frac{p_{H_2} \cdot p_{O_2}^{0.5}}{a_{H_2O}} \right)$
+      
+    * **$V_{act}$ (Sobrepotencial de Activación):** Modelado con la simplificación de Tafel para el ánodo y el cátodo.
+      
+      $V_{act} = \frac{RT}{\alpha_{an} nF} \ln \left( \frac{i}{i_{0,an}} \right) + \frac{RT}{\alpha_{cat} nF} \ln \left( \frac{i}{i_{0,cat}} \right)$
+
+      En esta oportunidad, se realiza la estimación de las densidad de corriente de intercambio para tener un mejor ajuste en comparación a la curva del paper.
+
+    * **$V_{ohm}$ (Sobrepotencial Óhmico):** Considera la resistividad de electrodos y la conductividad de la membrana (calculada con la correlación de Springer).
+      
+      $R_{anodo} = \tau_{anodo} \cdot \rho_{anodo}$
+      
+      $R_{catodo} = \tau_{catodo}\cdot \rho_{catodo}$
+  
+      $R_{elec} = R_{anodo} + R_{catodo}$
+  
+      Se toma el supuesto de una resistencia de contacto $R_{contact} = 0.175$ ohms.
+  
+      $\sigma_{mem} = (0.005139 \lambda - 0.00326) \cdot \exp \left[ 1268 \left( \frac{1}{303.15} - \frac{1}{T} \right) \right]$
+
+      $V_{ohm} = i \cdot \left( R_{elec} + \frac{t_{mem}}{\sigma_{mem}} + R_{contact} \right)$
+      
     * **$V_{diff}$ (Sobrepotencial por Difusión):** Modelado en base a la corriente límite (`i_L`).
-4.  **Comparación:** El script calcula el error entre el vector de voltajes calculado (`V_cell`) con el vector de voltajes del paper (`Vcell_paper`), este útlimo debe ser escrito como lista dentro del código. 
-5.  **Generación de Gráficos:** Se generan tres figuras que comparan el "Modelo recreado" vs. el "Modelo Colbertaldo P.":
+
+      $V_{diff} = \frac{RT}{\alpha_{an} nF} \ln \left( \frac{i_L}{i_L - i} \right)$
+
+5.  **Comparación:** El script calcula el error entre el vector de voltajes calculado (`V_cell`) con el vector de voltajes del paper (`Vcell_paper`), este útlimo debe ser escrito como lista dentro del código. 
+6.  **Generación de Gráficos:** Se generan tres figuras que comparan el "Modelo recreado" vs. el "Modelo Colbertaldo P.":
     * Curva de Polarización (V vs. A/cm²).
     * Producción de H₂ (Nm³/h) vs. Potencia Eléctrica (kW).
     * Trabajo Específico (kWh/kg H₂) vs. Producción de H₂ (g/h).
@@ -79,7 +107,7 @@ Se define la potencia máxima como:
 
    
 Donde:
-* $y = [T_{K}, i_{cell}]$ es el vector de estado (Temperatura y Corriente).
+* $y = [T_{K}, I_{cell}]$ es el vector de estado (Temperatura y Corriente).
 * $M$ es la **Matriz**, que define qué ecuaciones son diferenciales y cuáles son algebraicas.
 * $\text{res}$ es el vector de residuos calculado en cada paso de tiempo.
 
@@ -187,6 +215,8 @@ $$
     * Arriba: El perfil de potencia de entrada del panel solar (kW).
     * Abajo: La evolución de la temperatura del electrolizador (°C) como respuesta a esa potencia.
 
+![Grafico de comportamiento temperatura PEM dado la potencia solar de entrada](parte2_pi_jj.jpg)
+
 ---
 
 ## Estructura de Archivos y Dependencias
@@ -196,8 +226,8 @@ $$
 * `main_SIMULACION.m`: Ejecuta la simulación dinámica de 24 horas.
 
 ### Funciones del Modelo
-* `calcularCurvaPolarizacion.m`: (Vectorizado) Calcula la curva V-I completa para la validación.
-* `calcular_voltaje_ESCALAR.m`: (Escalar) Calcula un solo punto (V, i) para el solver DAE. Maneja el caso `i=0` para evitar errores matemáticos.
+* `calcularCurvaPolarizacion.m`: (Vectorizado) Calcula la curva V-I completa para la validación a una cierta temperatura y presión.
+* `calcular_voltaje_ESCALAR.m`: (Escalar) Calcula un solo punto (V, I) para el solver DAE. Maneja el caso `i=0` para evitar errores matemáticos.
 * `sistema_dae.m`: Define el sistema DAE (balance de energía y potencia) para `ode15s`.
 * `calculo_DeltaG.m` y `calculo_DeltaG_MODIFICADO.m`: Calculan propiedades termodinámicas (ΔG, ΔH, ΔS) en función de la temperatura, usando integrales de polinomios de Cp.
 
