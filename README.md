@@ -181,7 +181,7 @@ Residuo Algebraico (`res2`): Balance de Potencia.
 Este residuo fuerza a que sea cero la resta entre la potencia entregada del panel solar y la potencia de la PEM. Calcula la discrepancia entre la energía disponible y la consumida:
 
 $$
-\text{res}_2 = P_{in}(t) - \underbrace{V_{cell}(I_{cell}, T) \cdot I_{cell} \cdot A \cdot N_{cells}}_{\text{Potencia Consumida de la PEM}}
+\text{res}_2 = P(t) - \underbrace{V_{cell}(I_{cell}, T) \cdot I_{cell} \cdot A \cdot N_{cells}}_{\text{Potencia Consumida de la PEM}}
 $$
 
 Para realizar el cálculo de voltaje, el solver llama continuamente a `calcular_voltaje_ESCALAR.m`. Esta es una versión optimizada del modelo de la Parte 1, diseñada para calcular el voltaje para un solo valor (escalar) de corriente y temperatura.
